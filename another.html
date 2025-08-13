@@ -16,7 +16,10 @@
     <button onclick="fetchQuote()">New Quote</button>
     <script>
         async function fetchQuote() {
-            const res = await fetch('https://api.quotable.io/random');
+            // Using GET method explicitly
+            const res = await fetch('https://api.quotable.io/random', {
+                method: 'GET'
+            });
             const data = await res.json();
             document.getElementById('quote').textContent = `"${data.content}"`;
             document.getElementById('author').textContent = `— ${data.author}`;
