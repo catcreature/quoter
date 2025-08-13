@@ -1,212 +1,233 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hello World with Quotes (CORS-safe)</title>
-    <style>
-        :root {
-            --bg: #f0f8ff;
-            --ink: #1f2937;
-            --card: #ffffff;
-            --muted: #6b7280;
-        }
-        * { box-sizing: border-box; }
-        html, body { height: 100%; }
-        body {
-            margin: 0;
-            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(180deg, var(--bg), #e6f2ff);
-            color: var(--ink);
-            display: flex;
-            flex-direction: column;
-        }
-        header {
-            position: sticky;
-            top: 0;
-            background: #ecf0f1;
-            backdrop-filter: saturate(130%) blur(4px);
-            padding: 16px 24px;
-            box-shadow: 0 4px 10px rgba(0,0,0,.08);
-            z-index: 10;
-        }
-        header h1 {
-            margin: 0;
-            font-size: 1.75rem;
-            display: inline-block;
-            padding: 8px 16px;
-            border-radius: 12px;
-            background: #ffffff;
-            box-shadow: 0 2px 6px rgba(0,0,0,.08);
-        }
-        main {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-        }
-        .quote-card {
-            max-width: 720px;
-            width: 100%;
-            background: var(--card);
-            border-radius: 16px;
-            padding: 28px 32px;
-            box-shadow: 0 6px 24px rgba(0,0,0,.08);
-            text-align: center;
-            transition: transform .2s ease;
-        }
-        .quote-card:hover { transform: translateY(-2px); }
-        .quote-text {
-            font-size: clamp(1.2rem, 2.4vw, 1.75rem);
-            line-height: 1.5;
-        }
-        .quote-author {
-            margin-top: 12px;
-            color: var(--muted);
-            font-size: 0.95rem;
-        }
-        /* .hint { margin-top: 10px; font-size: .85rem; color: var(--muted); } */
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hello World with Quotes (CORS-safe)</title>
+  <style>
+    :root {
+      --bg: #f0f8ff;
+      --ink: #1f2937;
+      --card: #ffffff;
+      --muted: #6b7280;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(180deg, var(--bg), #e6f2ff);
+      color: var(--ink);
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      background: #ecf0f1;
+      backdrop-filter: saturate(130%) blur(4px);
+      padding: 16px 24px;
+      box-shadow: 0 4px 10px rgba(0,0,0,.08);
+      z-index: 10;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.75rem;
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 12px;
+      background: #ffffff;
+      box-shadow: 0 2px 6px rgba(0,0,0,.08);
+    }
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .quote-card {
+      max-width: 720px;
+      width: 100%;
+      background: var(--card);
+      border-radius: 16px;
+      padding: 28px 32px;
+      box-shadow: 0 6px 24px rgba(0,0,0,.08);
+      text-align: center;
+      transition: transform .2s ease;
+    }
+    .quote-card:hover { transform: translateY(-2px); }
+    .quote-text {
+      font-size: clamp(1.2rem, 2.4vw, 1.75rem);
+      line-height: 1.5;
+    }
+    .quote-author {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+    .hint { margin-top: 10px; font-size: .85rem; color: var(--muted); }
 
-        #test-results { margin: 18px auto 0; max-width: 720px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 12px; color: #0f172a; }
-        .test-pass { color: #065f46; }
-        .test-fail { color: #991b1b; }
-    </style>
+    #test-results { margin: 18px auto 0; max-width: 720px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 12px; color: #0f172a; }
+    .test-pass { color: #065f46; }
+    .test-fail { color: #991b1b; }
+  </style>
 </head>
 <body>
-    <header>
-        <h1>Hello, World! 🌍</h1>
-    </header>
+  <header>
+    <h1>Hello, World! 🌍</h1>
+  </header>
 
-    <main>
-        <article aria-live="polite" aria-busy="true" class="quote-card" id="quote-card">
-            <div class="quote-text" id="quote">Loading quote…</div>
-            <div class="quote-author" id="author"></div>
-            <!-- Hint line removed -->
-        </article>
-    </main>
+  <main>
+    <article aria-live="polite" aria-busy="true" class="quote-card" id="quote-card">
+      <div class="quote-text" id="quote">Loading quote…</div>
+      <div class="quote-author" id="author"></div>
+      <div class="hint" id="hint">Refresh for a new quote. If the network is blocked, a local random quote is shown.</div>
+    </article>
+  </main>
 
-    <section id="test-results" aria-label="Automated Tests"></section>
+  <section id="test-results" aria-label="Automated Tests"></section>
 
-    <script>
-        // ... (script unchanged except hint handling)
-        const API_URL = 'https://api.quotable.io/random';
+  <script>
+    /**
+     * Fix: The earlier version accidentally started an extra fetch that wasn't awaited,
+     * which could throw an unhandled "TypeError: Failed to fetch" in sandboxed/CORS
+     * environments. This rewrite uses a single awaited fetch with a timeout wrapper,
+     * and cleanly falls back to local quotes when any network error occurs.
+     */
 
-        const LOCAL_QUOTES = [
-            { content: "The only limit to our realization of tomorrow is our doubts of today.", author: "Franklin D. Roosevelt" },
-            { content: "In the middle of difficulty lies opportunity.", author: "Albert Einstein" },
-            { content: "What you do speaks so loudly that I cannot hear what you say.", author: "Ralph Waldo Emerson" },
-            { content: "It always seems impossible until it’s done.", author: "Nelson Mandela" },
-            { content: "Simplicity is the ultimate sophistication.", author: "Leonardo da Vinci" },
-            { content: "Well begun is half done.", author: "Aristotle" },
-            { content: "Do or do not. There is no try.", author: "Yoda" },
-            { content: "You miss 100% of the shots you don’t take.", author: "Wayne Gretzky" },
-            { content: "Whether you think you can or you think you can’t, you’re right.", author: "Henry Ford" },
-            { content: "Stay hungry, stay foolish.", author: "Steve Jobs" },
-            { content: "The secret of getting ahead is getting started.", author: "Mark Twain" },
-            { content: "Act as if what you do makes a difference. It does.", author: "William James" },
-            { content: "Make it work, make it right, make it fast.", author: "Kent Beck" },
-            { content: "Perfection is achieved not when there is nothing more to add, but when there is nothing left to take away.", author: "Antoine de Saint‑Exupéry" },
-            { content: "If you’re going through hell, keep going.", author: "Winston Churchill" },
-            { content: "The best time to plant a tree was 20 years ago. The second best time is now.", author: "Chinese Proverb" },
-            { content: "Not all those who wander are lost.", author: "J. R. R. Tolkien" },
-            { content: "The journey of a thousand miles begins with one step.", author: "Lao Tzu" },
-            { content: "Dream big and dare to fail.", author: "Norman Vaughan" },
-            { content: "If I have seen further it is by standing on the shoulders of giants.", author: "Isaac Newton" },
-            { content: "Happiness depends upon ourselves.", author: "Aristotle" },
-            { content: "Energy and persistence conquer all things.", author: "Benjamin Franklin" },
-            { content: "The hard days are what make you stronger.", author: "Aly Raisman" },
-            { content: "Start where you are. Use what you have. Do what you can.", author: "Arthur Ashe" },
-            { content: "Quality is not an act, it is a habit.", author: "Aristotle" }
-        ];
+    const API_URL = 'https://api.quotable.io/random';
 
-        let UNHANDLED_REJECTIONS = 0;
-        window.addEventListener('unhandledrejection', (e) => {
-            UNHANDLED_REJECTIONS += 1;
-            e.preventDefault?.();
+    // A safe local fallback list to avoid CORS/network failures.
+    const LOCAL_QUOTES = [
+      { content: "The only limit to our realization of tomorrow is our doubts of today.", author: "Franklin D. Roosevelt" },
+      { content: "In the middle of difficulty lies opportunity.", author: "Albert Einstein" },
+      { content: "What you do speaks so loudly that I cannot hear what you say.", author: "Ralph Waldo Emerson" },
+      { content: "It always seems impossible until it’s done.", author: "Nelson Mandela" },
+      { content: "Simplicity is the ultimate sophistication.", author: "Leonardo da Vinci" },
+      { content: "Well begun is half done.", author: "Aristotle" },
+      { content: "Do or do not. There is no try.", author: "Yoda" },
+      { content: "You miss 100% of the shots you don’t take.", author: "Wayne Gretzky" },
+      { content: "Whether you think you can or you think you can’t, you’re right.", author: "Henry Ford" },
+      { content: "Stay hungry, stay foolish.", author: "Steve Jobs" },
+      { content: "The secret of getting ahead is getting started.", author: "Mark Twain" },
+      { content: "Act as if what you do makes a difference. It does.", author: "William James" },
+      { content: "Make it work, make it right, make it fast.", author: "Kent Beck" },
+      { content: "Perfection is achieved not when there is nothing more to add, but when there is nothing left to take away.", author: "Antoine de Saint‑Exupéry" },
+      { content: "If you’re going through hell, keep going.", author: "Winston Churchill" },
+      { content: "The best time to plant a tree was 20 years ago. The second best time is now.", author: "Chinese Proverb" },
+      { content: "Not all those who wander are lost.", author: "J. R. R. Tolkien" },
+      { content: "The journey of a thousand miles begins with one step.", author: "Lao Tzu" },
+      { content: "Dream big and dare to fail.", author: "Norman Vaughan" },
+      { content: "If I have seen further it is by standing on the shoulders of giants.", author: "Isaac Newton" },
+      { content: "Happiness depends upon ourselves.", author: "Aristotle" },
+      { content: "Energy and persistence conquer all things.", author: "Benjamin Franklin" },
+      { content: "The hard days are what make you stronger.", author: "Aly Raisman" },
+      { content: "Start where you are. Use what you have. Do what you can.", author: "Arthur Ashe" },
+      { content: "Quality is not an act, it is a habit.", author: "Aristotle" }
+    ];
+
+    // Track unhandled rejections so our tests can assert none occurred.
+    let UNHANDLED_REJECTIONS = 0;
+    window.addEventListener('unhandledrejection', (e) => {
+      UNHANDLED_REJECTIONS += 1;
+      // prevent noisy console logs in certain sandboxes
+      e.preventDefault?.();
+    });
+
+    function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+    async function fetchWithTimeout(url, options = {}, timeoutMs = 2500) {
+      const controller = new AbortController();
+      const id = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const res = await fetch(url, {
+          ...options,
+          headers: { 'Accept': 'application/json', ...(options.headers || {}) },
+          signal: controller.signal,
         });
+        return res;
+      } finally {
+        clearTimeout(id);
+      }
+    }
 
-        function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+    async function getQuote() {
+      try {
+        const res = await fetchWithTimeout(API_URL, {}, 2500);
+        if (!res || !res.ok) throw new Error('bad status: ' + (res && res.status));
+        const data = await res.json();
+        if (!data || !data.content) throw new Error('bad payload');
+        return { content: data.content, author: data.author || 'Unknown', source: 'api' };
+      } catch (err) {
+        // Fallback when CORS/network fails
+        const local = pickRandom(LOCAL_QUOTES);
+        return { ...local, source: 'local', error: (err && err.message) || String(err) };
+      }
+    }
 
-        async function fetchWithTimeout(url, options = {}, timeoutMs = 2500, acceptHeader = 'application/json') {
-            const controller = new AbortController();
-            const id = setTimeout(() => controller.abort(), timeoutMs);
-            try {
-                const res = await fetch(url, {
-                    ...options,
-                    headers: { 'Accept': acceptHeader, ...(options.headers || {}) },
-                    signal: controller.signal,
-                });
-                return res;
-            } finally {
-                clearTimeout(id);
-            }
-        }
+    function renderQuote(q) {
+      const quoteEl = document.getElementById('quote');
+      const authorEl = document.getElementById('author');
+      const card = document.getElementById('quote-card');
+      quoteEl.textContent = `“${q.content}”`;
+      authorEl.textContent = `— ${q.author}`;
+      card.setAttribute('aria-busy', 'false');
+      const hint = document.getElementById('hint');
+      hint.textContent = q.source === 'api'
+        ? 'Loaded from API. Refresh for a new quote.'
+        : 'Loaded from local list (network blocked). Refresh for a new quote.';
+    }
 
-        const UNKNOWN_AUTHOR = 'Unknown';
+    // --- Tests (existing tests kept, more added below) ---
+    function runTests() {
+      const results = [];
+      function pass(name) { results.push({ name, ok: true }); }
+      function fail(name, msg) { results.push({ name, ok: false, msg }); }
 
-        async function getQuote() {
-            try {
-                const res = await fetchWithTimeout(API_URL, {}, 2500, 'application/json');
-                if (!res || !res.ok) throw new Error('bad status: ' + (res && res.status));
-                const data = await res.json();
-                if (!data || !data.content) throw new Error('bad payload');
-                return { content: data.content, author: data.author || UNKNOWN_AUTHOR, source: 'api' };
-            } catch (err) {
-                const local = pickRandom(LOCAL_QUOTES);
-                return { ...local, source: 'local', error: (err && err.message) || String(err) };
-            }
-        }
+      // Test 1: quote text rendered (EXISTING)
+      const text = document.getElementById('quote')?.textContent?.trim() || '';
+      if (text && text !== 'Loading quote…' && text.length > 5) pass('renders a quote to the page');
+      else fail('renders a quote to the page', 'quote text missing or too short');
 
-        function renderQuote(q) {
-            const quoteEl = document.getElementById('quote');
-            const authorEl = document.getElementById('author');
-            const card = document.getElementById('quote-card');
-            quoteEl.textContent = `“${q.content}”`;
-            authorEl.textContent = `— ${q.author}`;
-            card.setAttribute('aria-busy', 'false');
-            // Hint line removed
-        }
+      // Test 2: local randomizer produces variety (EXISTING)
+      const sample = new Set();
+      for (let i = 0; i < 12; i++) sample.add(pickRandom(LOCAL_QUOTES).content);
+      if (sample.size > 1) pass('local fallback provides variability across runs');
+      else fail('local fallback provides variability across runs', 'random picker not varying');
 
-        function runTests() {
-            const results = [];
-            function pass(name) { results.push({ name, ok: true }); }
-            function fail(name, msg) { results.push({ name, ok: false, msg }); }
+      // Test 3: author line present (EXISTING)
+      const author = document.getElementById('author')?.textContent?.trim() || '';
+      if (author.startsWith('— ') && author.length > 3) pass('shows an author line');
+      else fail('shows an author line', 'author line missing');
 
-            const text = document.getElementById('quote')?.textContent?.trim() || '';
-            if (text && text !== 'Loading quote…' && text.length > 5) pass('renders a quote to the page');
-            else fail('renders a quote to the page', 'quote text missing or too short');
+      // Test 4: no unhandled promise rejections (NEW)
+      if (UNHANDLED_REJECTIONS === 0) pass('no unhandled promise rejections');
+      else fail('no unhandled promise rejections', `saw ${UNHANDLED_REJECTIONS}`);
 
-            const sample = new Set();
-            for (let i = 0; i < 12; i++) sample.add(pickRandom(LOCAL_QUOTES).content);
-            if (sample.size > 1) pass('local fallback provides variability across runs');
-            else fail('local fallback provides variability across runs', 'random picker not varying');
+      // Test 5: card aria-busy toggled off after render (NEW)
+      const busy = document.getElementById('quote-card')?.getAttribute('aria-busy');
+      if (busy === 'false') pass('sets aria-busy to false after render');
+      else fail('sets aria-busy to false after render', `aria-busy is ${busy}`);
 
-            const author = document.getElementById('author')?.textContent?.trim() || '';
-            if (author.startsWith('— ') && author.length > 3) pass('shows an author line');
-            else fail('shows an author line', 'author line missing');
+      // Test 6: hint reflects source (NEW)
+      const hintText = document.getElementById('hint')?.textContent || '';
+      if (/Loaded from (API|local list)/.test(hintText)) pass('hint reflects data source');
+      else fail('hint reflects data source', 'hint did not mention API or local list');
 
-            if (UNHANDLED_REJECTIONS === 0) pass('no unhandled promise rejections');
-            else fail('no unhandled promise rejections', `saw ${UNHANDLED_REJECTIONS}`);
+      // Render results
+      const out = document.getElementById('test-results');
+      out.innerHTML = results.map(r => r.ok
+        ? `<div class="test-pass">✔ ${r.name}</div>`
+        : `<div class="test-fail">✘ ${r.name} — ${r.msg}</div>`
+      ).join('');
+    }
 
-            const busy = document.getElementById('quote-card')?.getAttribute('aria-busy');
-            if (busy === 'false') pass('sets aria-busy to false after render');
-            else fail('sets aria-busy to false after render', `aria-busy is ${busy}`);
-
-            // Hint test removed
-
-            const out = document.getElementById('test-results');
-            out.innerHTML = results.map(r => r.ok
-                ? `<div class="test-pass">✔ ${r.name}</div>`
-                : `<div class="test-fail">✘ ${r.name} — ${r.msg}</div>`
-            ).join('');
-        }
-
-        (async () => {
-            const q = await getQuote();
-            renderQuote(q);
-            runTests();
-        })();
-    </script>
+    (async () => {
+      const q = await getQuote();
+      renderQuote(q);
+      runTests();
+    })();
+  </script>
 </body>
 </html>
