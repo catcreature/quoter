@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Random Quote</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 2em; background: #f9f9f9; }
+        #quote { font-size: 1.5em; margin-bottom: 1em; }
+        #author { font-size: 1em; color: #555; }
+        button { padding: 0.5em 1em; font-size: 1em; }
+    </style>
+</head>
+<body>
+    <div id="quote">Loading...</div>
+    <div id="author"></div>
+    <button onclick="fetchQuote()">New Quote</button>
+    <script>
+        async function fetchQuote() {
+            const res = await fetch('https://api.quotable.io/random');
+            const data = await res.json();
+            document.getElementById('quote').textContent = `"${data.content}"`;
+            document.getElementById('author').textContent = `— ${data.author}`;
+        }
+        fetchQuote();
+    </script>
+</body>
+</html>
