@@ -17,7 +17,7 @@
     <script>
         async function fetchQuote() {
             // Using GET method explicitly
-            const res = await fetch('https://api.quotable.io/random', {
+            const res = await fetch('https://zenquotes.io/api/random', {
                 method: 'GET'
             });
             const data = await res.json();
