@@ -154,14 +154,15 @@
 
     async function getQuote() {
       try {
-      const res = await fetchWithTimeout(API_URL, {}, 2500);
-      if (!res || !res.ok) throw new Error('bad status: ' + (res && res.status));
-      const data = await res.json();
-      if (!data || !data.content) throw new Error('bad payload');
-      return { content: data.content, author: data.author || 'Unknown', source: 'api' };
+        const res = await fetchWithTimeout(API_URL, {}, 2500);
+        if (!res || !res.ok) throw new Error('bad status: ' + (res && res.status));
+        const data = await res.json();
+        if (!data || !data.content) throw new Error('bad payload');
+        return { content: data.content, author: data.author || 'Unknown', source: 'api' };
       } catch (err) {
-      // Show error message from API failure
-      return { content: 'Failed to load quote from API.', author: '', source: 'error', error: (err && err.message) || String(err) };
+        // Fallback when CORS/network fails
+        const local = pickRandom(LOCAL_QUOTES);
+        return { ...local, source: 'local', error: (err && err.message) || String(err) };
       }
     }
 
