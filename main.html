@@ -137,13 +137,13 @@
 
     function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
-    async function fetchWithTimeout(url, options = {}, timeoutMs = 2500) {
+    async function fetchWithTimeout(url, options = {}, timeoutMs = 2500, acceptHeader = 'application/json') {
       const controller = new AbortController();
       const id = setTimeout(() => controller.abort(), timeoutMs);
       try {
         const res = await fetch(url, {
           ...options,
-          headers: { 'Accept': 'application/json', ...(options.headers || {}) },
+          headers: { 'Accept': acceptHeader, ...(options.headers || {}) },
           signal: controller.signal,
         });
         return res;
@@ -152,18 +152,26 @@
       }
     }
 
+    const UNKNOWN_AUTHOR = 'Unknown';
+
     async function getQuote() {
       try {
-        const res = await fetchWithTimeout(API_URL, {}, 2500);
+        const res = await fetchWithTimeout(API_URL, {}, 2500, 'application/json');
         if (!res || !res.ok) throw new Error('bad status: ' + (res && res.status));
         const data = await res.json();
         if (!data || !data.content) throw new Error('bad payload');
-        return { content: data.content, author: data.author || 'Unknown', source: 'api' };
+        return { content: data.content, author: data.author || UNKNOWN_AUTHOR, source: 'api' };
       } catch (err) {
         // Fallback when CORS/network fails
         const local = pickRandom(LOCAL_QUOTES);
         return { ...local, source: 'local', error: (err && err.message) || String(err) };
       }
+    }
+
+    function getHintText(source) {
+      return source === 'api'
+        ? 'Loaded from API. Refresh for a new quote.'
+        : 'Loaded from local list (network blocked). Refresh for a new quote.';
     }
 
     function renderQuote(q) {
@@ -174,9 +182,7 @@
       authorEl.textContent = `— ${q.author}`;
       card.setAttribute('aria-busy', 'false');
       const hint = document.getElementById('hint');
-      hint.textContent = q.source === 'api'
-        ? 'Loaded from API. Refresh for a new quote.'
-        : 'Loaded from local list (network blocked). Refresh for a new quote.';
+      hint.textContent = getHintText(q.source);
     }
 
     // --- Tests (existing tests kept, more added below) ---
