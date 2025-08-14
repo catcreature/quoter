@@ -66,7 +66,7 @@
       justify-content: center;
       padding: 24px;
     }
-    .quote-card, .world-card {
+    .quote-card, .world-card, .calc-card {
       max-width: 720px;
       width: 100%;
       background: var(--card);
@@ -76,7 +76,7 @@
       text-align: center;
       transition: transform .2s ease;
     }
-    .quote-card:hover, .world-card:hover { transform: translateY(-2px); }
+    .quote-card:hover, .world-card:hover, .calc-card:hover { transform: translateY(-2px); }
     .quote-text {
       font-size: clamp(1.2rem, 2.4vw, 1.75rem);
       line-height: 1.5;
@@ -101,6 +101,40 @@
       font-size: 1rem;
       margin-top: 8px;
     }
+    .calc-form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+      margin-top: 12px;
+    }
+    .calc-form input, .calc-form select {
+      padding: 8px;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: 1px solid #d1e3f7;
+      width: 120px;
+      text-align: center;
+    }
+    .calc-form button {
+      padding: 8px 18px;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: none;
+      background: #e6f2ff;
+      color: var(--ink);
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .calc-form button:hover {
+      background: #d1e3f7;
+    }
+    .calc-result {
+      margin-top: 16px;
+      font-size: 1.2rem;
+      color: #065f46;
+      min-height: 1.2em;
+    }
   </style>
 </head>
 <body>
@@ -111,6 +145,7 @@
   <nav>
     <button class="tab-btn active" id="tab-quotes" onclick="showTab('quotes')">Quotes</button>
     <button class="tab-btn" id="tab-world" onclick="showTab('world')">World Pic</button>
+    <button class="tab-btn" id="tab-calc" onclick="showTab('calc')">Calculator</button>
   </nav>
 
   <main>
@@ -123,6 +158,21 @@
       <img class="world-img" src="https://upload.wikimedia.org/wikipedia/commons/9/97/The_Earth_seen_from_Apollo_17.jpg" alt="Earth from space" />
       <div class="world-caption">Earth as seen from Apollo 17 (NASA, 1972)</div>
     </article>
+    <article class="calc-card" id="calc-card" style="display:none;">
+      <h2>Basic Calculator</h2>
+      <form class="calc-form" id="calc-form" onsubmit="event.preventDefault(); calcCompute();">
+        <input type="number" id="calc-a" required placeholder="First number" />
+        <select id="calc-op">
+          <option value="+">+</option>
+          <option value="-">−</option>
+          <option value="*">×</option>
+          <option value="/">÷</option>
+        </select>
+        <input type="number" id="calc-b" required placeholder="Second number" />
+        <button type="submit">Calculate</button>
+      </form>
+      <div class="calc-result" id="calc-result"></div>
+    </article>
   </main>
 
   <section id="test-results" aria-label="Automated Tests"></section>
@@ -132,11 +182,38 @@
     function showTab(tab) {
       document.getElementById('tab-quotes').classList.toggle('active', tab === 'quotes');
       document.getElementById('tab-world').classList.toggle('active', tab === 'world');
+      document.getElementById('tab-calc').classList.toggle('active', tab === 'calc');
       document.getElementById('quote-card').style.display = tab === 'quotes' ? '' : 'none';
       document.getElementById('world-card').style.display = tab === 'world' ? '' : 'none';
+      document.getElementById('calc-card').style.display = tab === 'calc' ? '' : 'none';
     }
 
-    const API_URL = 'https://zenquotes.io/api/randoms';
+    // Calculator logic
+    function calcCompute() {
+      const a = parseFloat(document.getElementById('calc-a').value);
+      const b = parseFloat(document.getElementById('calc-b').value);
+      const op = document.getElementById('calc-op').value;
+      let result = '';
+      if (isNaN(a) || isNaN(b)) {
+        result = 'Please enter valid numbers.';
+      } else {
+        switch (op) {
+          case '+': result = a + b; break;
+          case '-': result = a - b; break;
+          case '*': result = a * b; break;
+          case '/':
+            if (b === 0) result = 'Cannot divide by zero.';
+            else result = a / b;
+            break;
+          default: result = 'Unknown operation.';
+        }
+      }
+      document.getElementById('calc-result').textContent = result;
+    }
+
+    // API_URL expects a JSON response with { content: string, author: string }
+    // Example: { "content": "Quote text", "author": "Author name" }
+        const API_URL = 'https://zenquotes.io/api/randoms';
     const LOCAL_QUOTES = [
       { content: "The only limit to our realization of tomorrow is our doubts of today.", author: "Franklin D. Roosevelt" },
       { content: "In the middle of difficulty lies opportunity.", author: "Albert Einstein" },
