@@ -131,43 +131,7 @@
     // Tab switching logic
     function showTab(tab) {
       document.getElementById('tab-quotes').classList.toggle('active', tab === 'quotes');
-      document.getElementById('tab-world').classList.toggle('active', tab === 'world');
-      document.getElementById('quote-card').style.display = tab === 'quotes' ? '' : 'none';
-      document.getElementById('world-card').style.display = tab === 'world' ? '' : 'none';
-    }
-
-    const API_URL = 'https://zenquotes.io/api/randoms';
-    const LOCAL_QUOTES = [
-      { content: "The only limit to our realization of tomorrow is our doubts of today.", author: "Franklin D. Roosevelt" },
-      { content: "In the middle of difficulty lies opportunity.", author: "Albert Einstein" },
-      { content: "What you do speaks so loudly that I cannot hear what you say.", author: "Ralph Waldo Emerson" },
-      { content: "It always seems impossible until it’s done.", author: "Nelson Mandela" },
-      { content: "Simplicity is the ultimate sophistication.", author: "Leonardo da Vinci" },
-      { content: "Well begun is half done.", author: "Aristotle" },
-      { content: "Do or do not. There is no try.", author: "Yoda" },
-      { content: "You miss 100% of the shots you don’t take.", author: "Wayne Gretzky" },
-      { content: "Whether you think you can or you think you can’t, you’re right.", author: "Henry Ford" },
-      { content: "Stay hungry, stay foolish.", author: "Steve Jobs" },
-      { content: "The secret of getting ahead is getting started.", author: "Mark Twain" },
-      { content: "Act as if what you do makes a difference. It does.", author: "William James" },
-      { content: "Make it work, make it right, make it fast.", author: "Kent Beck" },
-      { content: "Perfection is achieved not when there is nothing more to add, but when there is nothing left to take away.", author: "Antoine de Saint‑Exupéry" },
-      { content: "If you’re going through hell, keep going.", author: "Winston Churchill" },
-      { content: "The best time to plant a tree was 20 years ago. The second best time is now.", author: "Chinese Proverb" },
-      { content: "Not all those who wander are lost.", author: "J. R. R. Tolkien" },
-      { content: "The journey of a thousand miles begins with one step.", author: "Lao Tzu" },
-      { content: "Dream big and dare to fail.", author: "Norman Vaughan" },
-      { content: "If I have seen further it is by standing on the shoulders of giants.", author: "Isaac Newton" },
-      { content: "Happiness depends upon ourselves.", author: "Aristotle" },
-      { content: "Energy and persistence conquer all things.", author: "Benjamin Franklin" },
-      { content: "The hard days are what make you stronger.", author: "Aly Raisman" },
-      { content: "Start where you are. Use what you have. Do what you can.", author: "Arthur Ashe" },
-      { content: "Quality is not an act, it is a habit.", author: "Aristotle" }
-    ];
-
-    let UNHANDLED_REJECTIONS = 0;
-    window.addEventListener('unhandledrejection', (e) => {
-      UNHANDLED_REJECTIONS += 1;
+      // prevent noisy console logs in certain sandboxes
       e.preventDefault?.();
     });
 
@@ -196,6 +160,7 @@
         if (!data || !data.content) throw new Error('bad payload');
         return { content: data.content, author: data.author || 'Unknown', source: 'api' };
       } catch (err) {
+        // Fallback when CORS/network fails
         const local = pickRandom(LOCAL_QUOTES);
         return { ...local, source: 'local', error: (err && err.message) || String(err) };
       }
@@ -214,35 +179,43 @@
         : 'Loaded from local list (network blocked). Refresh for a new quote.';
     }
 
+    // --- Tests (existing tests kept, more added below) ---
     function runTests() {
       const results = [];
       function pass(name) { results.push({ name, ok: true }); }
       function fail(name, msg) { results.push({ name, ok: false, msg }); }
 
+      // Test 1: quote text rendered (EXISTING)
       const text = document.getElementById('quote')?.textContent?.trim() || '';
       if (text && text !== 'Loading quote…' && text.length > 5) pass('renders a quote to the page');
       else fail('renders a quote to the page', 'quote text missing or too short');
 
+      // Test 2: local randomizer produces variety (EXISTING)
       const sample = new Set();
       for (let i = 0; i < 12; i++) sample.add(pickRandom(LOCAL_QUOTES).content);
       if (sample.size > 1) pass('local fallback provides variability across runs');
       else fail('local fallback provides variability across runs', 'random picker not varying');
 
+      // Test 3: author line present (EXISTING)
       const author = document.getElementById('author')?.textContent?.trim() || '';
       if (author.startsWith('— ') && author.length > 3) pass('shows an author line');
       else fail('shows an author line', 'author line missing');
 
+      // Test 4: no unhandled promise rejections (NEW)
       if (UNHANDLED_REJECTIONS === 0) pass('no unhandled promise rejections');
       else fail('no unhandled promise rejections', `saw ${UNHANDLED_REJECTIONS}`);
 
+      // Test 5: card aria-busy toggled off after render (NEW)
       const busy = document.getElementById('quote-card')?.getAttribute('aria-busy');
       if (busy === 'false') pass('sets aria-busy to false after render');
       else fail('sets aria-busy to false after render', `aria-busy is ${busy}`);
 
+      // Test 6: hint reflects source (NEW)
       const hintText = document.getElementById('hint')?.textContent || '';
       if (/Loaded from (API|local list)/.test(hintText)) pass('hint reflects data source');
       else fail('hint reflects data source', 'hint did not mention API or local list');
 
+      // Render results
       const out = document.getElementById('test-results');
       out.innerHTML = results.map(r => r.ok
         ? `<div class="test-pass">✔ ${r.name}</div>`
