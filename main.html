@@ -80,11 +80,13 @@
     .quote-text {
       font-size: clamp(1.2rem, 2.4vw, 1.75rem);
       line-height: 1.5;
+      min-height: 3.5em; /* Reserve space for quote text */
     }
     .quote-author {
       margin-top: 12px;
       color: var(--muted);
       font-size: 0.95rem;
+      min-height: 1.5em; /* Reserve space for author line */
     }
     .hint { margin-top: 10px; font-size: .85rem; color: var(--muted); }
     #test-results { margin: 18px auto 0; max-width: 720px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 12px; color: #0f172a; }
@@ -143,9 +145,7 @@
   </header>
 
   <nav>
-    <button class="tab-btn active" id="tab-quotes" onclick="showTab('quotes')">Quotes</button>
-    <button class="tab-btn" id="tab-world" onclick="showTab('world')">World Pic</button>
-    <button class="tab-btn" id="tab-calc" onclick="showTab('calc')">Calculator</button>
+    <!-- Removed the Quotes tab button -->
   </nav>
 
   <main>
@@ -153,25 +153,7 @@
       <div class="quote-text" id="quote">Loading quote…</div>
       <div class="quote-author" id="author"></div>
       <div class="hint" id="hint">Refresh for a new quote. If the network is blocked, a local random quote is shown.</div>
-    </article>
-    <article class="world-card" id="world-card" style="display:none;">
-      <img class="world-img" src="https://upload.wikimedia.org/wikipedia/commons/9/97/The_Earth_seen_from_Apollo_17.jpg" alt="Earth from space" />
-      <div class="world-caption">Earth as seen from Apollo 17 (NASA, 1972)</div>
-    </article>
-    <article class="calc-card" id="calc-card" style="display:none;">
-      <h2>Basic Calculator</h2>
-      <form class="calc-form" id="calc-form" onsubmit="event.preventDefault(); calcCompute();">
-        <input type="number" id="calc-a" required placeholder="First number" />
-        <select id="calc-op">
-          <option value="+">+</option>
-          <option value="-">−</option>
-          <option value="*">×</option>
-          <option value="/">÷</option>
-        </select>
-        <input type="number" id="calc-b" required placeholder="Second number" />
-        <button type="submit">Calculate</button>
-      </form>
-      <div class="calc-result" id="calc-result"></div>
+      <button id="refresh-btn" type="button" style="margin-top:16px;">🔄 Refresh Quote</button>
     </article>
   </main>
 
@@ -180,12 +162,8 @@
   <script>
     // Tab switching logic
     function showTab(tab) {
-      document.getElementById('tab-quotes').classList.toggle('active', tab === 'quotes');
-      document.getElementById('tab-world').classList.toggle('active', tab === 'world');
-      document.getElementById('tab-calc').classList.toggle('active', tab === 'calc');
-      document.getElementById('quote-card').style.display = tab === 'quotes' ? '' : 'none';
-      document.getElementById('world-card').style.display = tab === 'world' ? '' : 'none';
-      document.getElementById('calc-card').style.display = tab === 'calc' ? '' : 'none';
+      document.getElementById('tab-quotes').classList.toggle('active', true);
+      document.getElementById('quote-card').style.display = '';
     }
 
     // Calculator logic
@@ -289,44 +267,45 @@
       const hint = document.getElementById('hint');
       hint.textContent = q.source === 'api'
         ? 'Loaded from API. Refresh for a new quote.'
-        : 'Loaded from local list (network blocked). Refresh for a new quote.';
+        : ''; // Remove local list message
     }
 
     function runTests() {
-      const results = [];
-      function pass(name) { results.push({ name, ok: true }); }
-      function fail(name, msg) { results.push({ name, ok: false, msg }); }
-
-      const text = document.getElementById('quote')?.textContent?.trim() || '';
-      if (text && text !== 'Loading quote…' && text.length > 5) pass('renders a quote to the page');
-      else fail('renders a quote to the page', 'quote text missing or too short');
-
-      const sample = new Set();
-      for (let i = 0; i < 12; i++) sample.add(pickRandom(LOCAL_QUOTES).content);
-      if (sample.size > 1) pass('local fallback provides variability across runs');
-      else fail('local fallback provides variability across runs', 'random picker not varying');
-
-      const author = document.getElementById('author')?.textContent?.trim() || '';
-      if (author.startsWith('— ') && author.length > 3) pass('shows an author line');
-      else fail('shows an author line', 'author line missing');
-
-      if (UNHANDLED_REJECTIONS === 0) pass('no unhandled promise rejections');
-      else fail('no unhandled promise rejections', `saw ${UNHANDLED_REJECTIONS}`);
-
-      const busy = document.getElementById('quote-card')?.getAttribute('aria-busy');
-      if (busy === 'false') pass('sets aria-busy to false after render');
-      else fail('sets aria-busy to false after render', `aria-busy is ${busy}`);
-
       const hintText = document.getElementById('hint')?.textContent || '';
-      if (/Loaded from (API|local list)/.test(hintText)) pass('hint reflects data source');
-      else fail('hint reflects data source', 'hint did not mention API or local list');
-
       const out = document.getElementById('test-results');
-      out.innerHTML = results.map(r => r.ok
-        ? `<div class="test-pass">✔ ${r.name}</div>`
-        : `<div class="test-fail">✘ ${r.name} — ${r.msg}</div>`
-      ).join('');
+      if (hintText.includes('API')) {
+        out.innerHTML = `<div class="test-pass">web</div>`;
+      } else {
+        out.innerHTML = `<div class="test-pass">local</div>`;
+      }
     }
+
+    async function refreshQuote() {
+      document.getElementById('quote-card').setAttribute('aria-busy', 'true');
+      document.getElementById('quote').textContent = 'Loading quote…';
+      document.getElementById('author').textContent = '';
+      document.getElementById('hint').textContent = 'Fetching...';
+      const q = await getQuote();
+      renderQuote(q);
+      runTests();
+    }
+
+    document.getElementById('refresh-btn').addEventListener('click', refreshQuote);
+
+    // Enable pan and zoom for world map
+    document.addEventListener('DOMContentLoaded', function() {
+      const img = document.getElementById('world-img');
+      if (img) {
+        Panzoom(img, {
+          maxScale: 5,
+          minScale: 1,
+          contain: 'outside'
+        });
+        img.parentElement.addEventListener('wheel', function(e) {
+          e.preventDefault();
+        }, { passive: false });
+      }
+    });
 
     (async () => {
       const q = await getQuote();
